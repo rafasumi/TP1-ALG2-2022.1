@@ -1,5 +1,4 @@
 from optparse import OptionParser
-from time import time
 
 class Node:
   def __init__(self, symbol, code):
@@ -59,7 +58,6 @@ def compression(filename, output):
       
       if pattern != '':
         outputFile.write(f'{prefixCode}~{char}|')
-
 
 def decompression(filename, output):
   with open(filename, 'r') as inputFile:
