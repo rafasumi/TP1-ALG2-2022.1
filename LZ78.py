@@ -1,10 +1,10 @@
 from optparse import OptionParser
+from time import time
 
 class Node:
   def __init__(self, symbol, code):
     self.symbol = symbol
     self.code = code
-    self.isLeaf = False
     self.children = {}
 
 class Trie:
@@ -25,31 +25,53 @@ class Trie:
         node.children[char] = newNode
         self.nextCode += 1
         return prefixCode
+  
+  def find(self, word):
+    node = self.root
+
+    for char in word:
+      if char in node.children:
+        node = node.children[char]
+      else:
+        return -1
+    
+    return node.code
 
 def compression(filename, output):
-  D = ['']
-  out = []
   tree = Trie()
   
   with open(filename, 'r') as inputFile:
     with open(output, 'w') as outputFile:
       pattern = ''
-      for char in inputFile.read():
+      outputFile.write('|')
+      while True:
+        char = inputFile.read(1)
+        if char == '': break
+
         pattern = pattern + char
-        if pattern in D:
+        prefixCode = tree.find(pattern)
+        if prefixCode != -1:
           continue
         else:
-          D.append(pattern)
           prefixCode = tree.insert(pattern)
-          out.append((prefixCode, char))
-          outputFile.write(str(prefixCode)+','+char+'|')
+          outputFile.write(f'{prefixCode}~{char}|')
           pattern = ''
-  
-  print(D)
-  print(out)
+      
+      if pattern != '':
+        outputFile.write(f'{prefixCode}~{char}|')
+
 
 def decompression(filename, output):
-  pass
+  with open(filename, 'r') as inputFile:
+    with open(output, 'w') as outputFile:
+      input = inputFile.read().split('|')[1:-1]
+      input = [x.split('~') for x in input]
+
+      aux = ['']
+      for index, char in input:
+        newStr = f'{aux[int(index)]}{char}'
+        aux.append(newStr)
+        outputFile.write(newStr)
 
 def main():
   parser = OptionParser()
