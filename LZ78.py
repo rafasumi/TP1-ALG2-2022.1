@@ -1,40 +1,4 @@
-from optparse import OptionParser
-
-class Node:
-  def __init__(self, symbol, code):
-    self.symbol = symbol
-    self.code = code
-    self.children = {}
-
-class Trie:
-  def __init__(self):
-    self.root = Node("", 0)
-    self.nextCode = 1
-  
-  def insert(self, word):
-    node = self.root
-    prefixCode = 0
-
-    for char in word:
-      if char in node.children:
-        node = node.children[char]
-        prefixCode = node.code
-      else:
-        newNode = Node(char, self.nextCode)
-        node.children[char] = newNode
-        self.nextCode += 1
-        return prefixCode
-  
-  def find(self, word):
-    node = self.root
-
-    for char in word:
-      if char in node.children:
-        node = node.children[char]
-      else:
-        return -1
-    
-    return node.code
+from Trie import Trie
 
 def compression(filename, output):
   tree = Trie()
@@ -70,23 +34,3 @@ def decompression(filename, output):
         newStr = f'{aux[int(index)]}{char}'
         aux.append(newStr)
         outputFile.write(newStr)
-
-def main():
-  parser = OptionParser()
-  parser.add_option('-c', action='store', type='string', dest='compression')
-  parser.add_option('-x', action='store', type='string', dest='decompression')
-  parser.add_option('-o', action='store', type='string', dest='output')
-
-  (options, _) = parser.parse_args()
-
-  if options.compression:
-    filename = options.compression
-    output = options.output if options.output else filename.replace('.txt', '.z78')
-    compression(filename, output)
-  elif options.decompression:
-    filename = options.decompression
-    output = options.output if options.output else filename.replace('.z78', '.txt')
-    decompression(filename, output)
-
-if __name__ == '__main__':
-  main()
